@@ -1,0 +1,58 @@
+#CUDA
+############
+
+CUDA_OPTIONS = ""
+
+# Architecture
+QT_CUDA_ARCH = $$system(echo %CUDA_ARCH%)
+for(arch, QT_CUDA_ARCH) {
+	CUDA_OPTIONS += -gencode arch=compute_$$arch,code=compute_$$arch
+}
+
+# verbose
+#CUDA_OPTIONS += --ptxas-options=-v
+
+# max registre
+CUDA_OPTIONS += -maxrregcount=32 -m64
+CONFIG += console
+WINDOWS_TARGET_PLATFORM_VERSION=$$system(echo %WIN_SDK%)
+
+# Debug / Release -> Chemin de sortie
+build_pass:CONFIG(debug, debug|release) {
+	CUDA_OPTIONS += -g -G -D DEBUG
+	CUDA_OBJECTS_DIR = "./debug/"
+} else {
+	CUDA_OPTIONS += -D NDEBUG
+	CUDA_OBJECTS_DIR = "./release/"
+}
+
+# Ligne de commande Win32
+win32 {
+	# Flags de compil MSVC
+	CUDA_FLAGS = /EHsc /W3 /nologo /O2 /Zi 
+	build_pass:CONFIG(debug, debug|release) {
+		CUDA_FLAGS += /MDd
+	} else {
+		CUDA_FLAGS += /MD
+	}
+
+	# Fichier de sortie
+	cuda.output = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
+	
+	# Commande de compilation
+	QT_CUDA_BIN_PATH = $$(CUDA_BIN_PATH)
+	QT_CUDA_BIN_PATH = $$replace(QT_CUDA_BIN_PATH,\\\\,/)
+	
+	cuda.commands = \"$(CUDA_BIN_DIR)/nvcc.exe\" \
+			$$CUDA_OPTIONS \
+			-Xcompiler $$join(CUDA_FLAGS," ",'"','"') \
+			$$join(CUDA_INC_DIR,'" -I "','-I "','"') \
+			--compile -o ${QMAKE_FILE_OUT} \
+			${QMAKE_FILE_NAME}
+}
+
+LIBS += -L$(CUDA_LIB_DIR) -lcudart -lcuda	
+cuda.name = cuda ${QMAKE_FILE_IN}
+cuda.input = CUDA_SOURCES
+cuda.depend_command = echo ${QMAKE_FILE_IN}
+QMAKE_EXTRA_COMPILERS += cuda

@@ -1,0 +1,22 @@
+########################################################################
+#  MISC OPTIONS
+########################################################################
+
+DESTDIR 	= ../../../bin
+
+QT -= gui
+
+unix {
+    QMAKE_CXXFLAGS += -fopenmp -lm
+    QMAKE_LFLAGS += -fopenmp
+}
+
+win32 {
+    QMAKE_CXXFLAGS += /openmp
+}
+
+WINDOWS_TARGET_PLATFORM_VERSION=$$system(echo %WIN_SDK%)
+CONFIG += console
+QMAKE_CXXFLAGS += -O2
+
+########################################################################
