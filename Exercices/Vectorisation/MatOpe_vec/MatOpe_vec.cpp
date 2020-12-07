@@ -62,7 +62,7 @@ void matOpeAVX(const float* __restrict matrixA, const float* __restrict matrixB,
 void matOpeXSIMD(const float* const __restrict matrixA, float* __restrict matrixB, float* __restrict matrixOut, const int nrCols, const int nrRows)
 {
 	// TODO ! Pas d'indice, mais voir la page github  ;)
-	// 
+	// https://github.com/xtensor-stack/xsimd
 }
 
 //////////////////////////////////////////////
