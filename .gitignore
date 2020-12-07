@@ -10,3 +10,5 @@ release
 Diapos/~$HPC_CUDA.pptx
 *.pdb
 *.user
+Exercices/OpenMP/Mandel_omp/mandelbrot_scalar.ppm
+Exercices/OpenMP/Mandel_omp/mean_times.csv
