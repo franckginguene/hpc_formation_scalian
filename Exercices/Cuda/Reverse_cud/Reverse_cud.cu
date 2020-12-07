@@ -2,7 +2,7 @@
 
 #define N 10  // Nombre de données à traiter
 
-// Macro utilitaire de retour d'erreur	
+// Macro utilitaire pour le retour d'erreur	
 #define CUT_CHECK_ERROR(errorMessage) {											\
 	  cudaError_t err = cudaGetLastError();										\
 	  if( cudaSuccess != err) {													\
@@ -17,7 +17,7 @@
 //
 __global__ void Reverse (int *dataIn, int *dataOut)
 {
-	// TODO : boucle for
+	// TODO : boucle
 }
 
 //
