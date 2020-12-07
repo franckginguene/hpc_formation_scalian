@@ -1,2 +1,12 @@
 debug
 release
+/Exercices_Solutions
+.vs
+*.stash
+*.sln
+*.vcxproj
+*.filters
+/bin
+Diapos/~$HPC_CUDA.pptx
+*.pdb
+*.user
