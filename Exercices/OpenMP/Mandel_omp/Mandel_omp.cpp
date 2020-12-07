@@ -78,7 +78,6 @@ namespace omp {
 		float dx = (x1 - x0) / width;
 		float dy = (y1 - y0) / height;
 		int i, j;
-		#pragma omp parallel for num_threads(NUM_THREADS)
 		for (j = 0; j < height; j++)
 		{
 
