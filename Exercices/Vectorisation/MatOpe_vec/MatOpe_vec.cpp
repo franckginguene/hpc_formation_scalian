@@ -124,7 +124,7 @@ int main()
 
     float timStd = timer_stop(&start) / (float)NB_THROW;
 
-    printf("\nMatAdd (std): %.3fs\n", timStd);
+    printf("\nMatOpe (std): %.3fs\n", timStd);
 
     //
     // Lancement de la version vectorisée automatiquement
@@ -136,7 +136,7 @@ int main()
 
     float timAuto = timer_stop(&start) / (float)NB_THROW;
 
-    printf("\nMatAdd (vectorized auto): %.3fs\n", timAuto);
+    printf("\nMatOpe (vectorized auto): %.3fs\n", timAuto);
     printf(" - Speedup: %.3f\n",       timStd / timAuto);
 
     // Vérification des résultats
@@ -152,7 +152,7 @@ int main()
 
     float timSSE = timer_stop(&start) / (float)NB_THROW;
 
-    printf("\nMatAdd (vectorized SSE 128): %.3fs\n", timSSE);
+    printf("\nMatOpe (vectorized SSE 128): %.3fs\n", timSSE);
     printf(" - Speedup: %.3f\n",       timStd / timSSE);
 
     // Vérification des résultats
@@ -168,7 +168,7 @@ int main()
 
 	float timAVX = timer_stop(&start) / (float)NB_THROW;
 
-	printf("\nMatAdd (vectorized AVX 256): %.3fs\n", timAVX);
+	printf("\nMatOpe (vectorized AVX 256): %.3fs\n", timAVX);
 	printf(" - Speedup: %.3f\n", timStd / timAVX);
 
 	//
@@ -186,7 +186,7 @@ int main()
 
 	float timXSIMD = timer_stop(&start) / (float)NB_THROW;
 
-	printf("\nMatAdd (vectorized xsimd): %.3fs\n", timXSIMD);
+	printf("\nMatOpe (vectorized xsimd): %.3fs\n", timXSIMD);
 	printf(" - Speedup: %.3f\n", timStd / timXSIMD);
 
 	//
