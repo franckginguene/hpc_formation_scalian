@@ -58,32 +58,7 @@ return energy;
 //compute energy with GPU version
 __global__ void compute_energy_kernel(unsigned char * data_GPU, unsigned int * energy_GPU, int w, int h)
 {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-    //printf(" %d ", blockIdx.x);
-    if(x < w && y < h)
-    // if(x >= 0 && x < w*h)
-    {
-        int x0 = x == 0 ? x : x - 1;
-        int x1 = x == w - 1 ? x : x + 1;
-        int ix0 = (y * w + x0) * 3;
-        int ix1 = (y * w + x1) * 3;
-        unsigned int dxr = data_GPU[ix0    ] - data_GPU[ix1    ];
-        unsigned int dxg = data_GPU[ix0 + 1] - data_GPU[ix1 + 1];
-        unsigned int dxb = data_GPU[ix0 + 2] - data_GPU[ix1 + 2];
-        unsigned int dx = dxr * dxr + dxg * dxg + dxb * dxb;
-    
-        int y0 = y == 0 ? y : y - 1;
-        int y1 = y == h - 1 ? y : y + 1;
-        int iy0 = (y0 * w + x) * 3;
-        int iy1 = (y1 * w + x) * 3;
-        unsigned int dyr = data_GPU[iy0    ] - data_GPU[iy1    ];
-        unsigned int dyg = data_GPU[iy0 + 1] - data_GPU[iy1 + 1];
-        unsigned int dyb = data_GPU[iy0 + 2] - data_GPU[iy1 + 2];
-        unsigned int dy = dyr * dyr + dyg * dyg + dyb * dyb;
-        
-        energy_GPU[y * w + x] = dx + dy;
-    }
+	// TODO !
 }
 
 unsigned int * compute_energy(const unsigned char *data, int w, int h) {
