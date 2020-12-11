@@ -4,14 +4,15 @@
 #include <chrono>
 #include <assert.h>
 
-#define N 8192
-#define BLOCK_SIZE 32
+#define N			4000
+#define BLOCK_SIZE	16
 
 __global__ void matrix_transpose_naive(int *input, int *output)
 {
 
 	int indexX = threadIdx.x + blockIdx.x * blockDim.x;
 	int indexY = threadIdx.y + blockIdx.y * blockDim.y;
+
 	int index = indexY * N + indexX;
 	int transposedIndex = indexX * N + indexY;
 
