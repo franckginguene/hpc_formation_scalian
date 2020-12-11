@@ -12,3 +12,5 @@ Diapos/~$HPC_CUDA.pptx
 *.user
 Exercices/OpenMP/Mandel_omp/mandelbrot_scalar.ppm
 Exercices/OpenMP/Mandel_omp/mean_times.csv
+Exercices/Cuda/SeamCarver_cud/img.jpg
+Exercices/Cuda/SeamCarver_cud/img-energy0.jpg
