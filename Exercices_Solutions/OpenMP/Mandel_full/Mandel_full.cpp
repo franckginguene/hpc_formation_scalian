@@ -166,7 +166,7 @@ namespace xsimdomp {
 		std::iota(&arange[0], &arange[N], 0.f);
 		xsimd::batch<float, N> programIndex(&arange[0], xsimd::aligned_mode());
 		// std::iota(programIndex.begin(), programIndex.end(), 0.f
-		#pragma omp parallel for
+		#pragma omp parallel for num_threads(8)
 		for (int j = 0; j < height; j++)
 		{
 			for (int i = 0; i < width; i += N)
@@ -295,13 +295,13 @@ int main()
 
 	const int maxIters = 256;
 	constexpr size_t nbiter = 1;
-	constexpr int nbpoints = 20;
+	constexpr int nbpoints = 1;
 	int istep = 1;
 	std::vector<__int64> times_ms(nbpoints);
 	std::vector<float> x0_vec(nbpoints), x1_vec(nbpoints), y0_vec(nbpoints), y1_vec(nbpoints);
 	for (int i = 0; i < nbpoints; i++)
 	{
-		float scale = 4.f * (float)std::pow(2., -std::min(i*100 / 60., 53.)*0.7);
+		float scale = 4.f * (float)std::pow(2., -std::min(13*100 / 60., 53.)*0.7);
 		x0_vec[i] = zr - scale;
 		x1_vec[i] = zr + scale;
 		y0_vec[i] = zi - scale;
@@ -318,6 +318,7 @@ int main()
 	times_ms_file.open("C:/doc/formations/hpc_scalian/git/franck/Exercices_Solutions/OpenMP/Mandel_omp/example.csv");
 
 	//// scalar run ///////////////////////////////////////////////////////////////
+	int refCount;
 	for (int i = 0; i < nbpoints; i += istep)
 	{
 		std::fill(buf.begin(), buf.end(), 0);
@@ -326,6 +327,7 @@ int main()
 			scalar::mandelbrot(x0_vec[i], y0_vec[i], x1_vec[i], y1_vec[i], width, height, maxIters, buf.data());
 		});
 		times_ms_file << stats_scalar.min().count() << ",";
+		refCount = stats_scalar.mean().count();
 		std::cout << '\n' << "scalar " << stats_scalar << '\n';
 // Output optionel
 #ifdef WRITE_IMAGES
@@ -341,13 +343,14 @@ int main()
 	{
 		std::fill(buf.begin(), buf.end(), 0);
 
-		auto stats_4 = bencher([&]() {
+		auto xsimd_4 = bencher([&]() {
 			xsimd::mandelbrot<4>(x0_vec[i], y0_vec[i], x1_vec[i], y1_vec[i], width, height, maxIters, buf.data());
 		});
 
 
-		times_ms_file << stats_4.min().count() << ",";
-		std::cout << '\n' << "stats_4 " << stats_4 << '\n';
+		times_ms_file << xsimd_4.min().count() << ",";
+		std::cout << '\n' << "xsimd_4 " << xsimd_4 << '\n';
+		std::cout << " \tmean speedup: " << (float)(refCount) / (float)(xsimd_4.mean().count()) << '\n';
 	}
 	times_ms_file << "\n";
 
@@ -362,6 +365,7 @@ int main()
 
 		times_ms_file << stats_omp.min().count() << ",";
 		std::cout << '\n' << "omp " << stats_omp << '\n';
+		std::cout << " \tmean speedup: " << (float)(refCount) / (float)(stats_omp.mean().count()) << '\n';
 	}
 	times_ms_file << "\n";
 
@@ -371,16 +375,16 @@ int main()
 	{
 		std::fill(buf.begin(), buf.end(), 0);
 
-		auto stats_4omp = bencher([&]() {
+		auto xsimd_4omp = bencher([&]() {
 			xsimdomp::mandelbrot<4>(x0_vec[i], y0_vec[i], x1_vec[i], y1_vec[i], width, height, maxIters, buf.data());
 		});
 
 
-		times_ms_file << stats_4omp.min().count() << ",";
-		std::cout << '\n' << "stats_4omp " << stats_4omp << '\n';
+		times_ms_file << xsimd_4omp.min().count() << ",";
+		std::cout << '\n' << "xsimd_4omp " << xsimd_4omp << '\n';
+		std::cout << " \tmean speedup: " << (float)(refCount) / (float)(xsimd_4omp.mean().count()) << '\n';
 	}
 	times_ms_file << "\n";
 
-	getchar();
 	return 0;
 }
