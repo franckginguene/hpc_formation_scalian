@@ -7,9 +7,22 @@
 #define N			4000
 #define BLOCK_SIZE	16
 
+void matrix_transpose_cpu(int *input, int *output)
+{
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			int index	= j + i * N;
+			int indexT	= i + j * N;
+
+			output[indexT] = input[index];
+		}
+	}
+}
+
 __global__ void matrix_transpose_naive(int *input, int *output)
 {
-
 	int indexX = threadIdx.x + blockIdx.x * blockDim.x;
 	int indexY = threadIdx.y + blockIdx.y * blockDim.y;
 
@@ -41,13 +54,13 @@ __global__ void matrix_transpose_shared(int *input, int *output)
 	int index = indexY * N + indexX;
 	int transposedIndex = tindexY * N + tindexX;
 
-	// TODO remplir le tableau de mémoire partagée à partir de la mémoire global e
+	// TODO remplir le tableau de mï¿½moire partagï¿½e ï¿½ partir de la mï¿½moire global e
 	// sharedMemory[..][..] = ...
 
 	// Synchro des thread
 	__syncthreads();
 
-	// TODO recopie des données en mémoire globale
+	// TODO recopie des donnï¿½es en mï¿½moire globale
 	// output[..] = ...
 }
 
@@ -96,21 +109,36 @@ int main(void) {
 
 	// Copy inputs to device
 	cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
-	cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
 
 	dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE, 1);
 	dim3 gridSize(N / BLOCK_SIZE, N / BLOCK_SIZE, 1);
 
 	//////////////////////////////
-	// Naive version
+	// CPU version
 	//////////////////////////////
 	auto t0 = std::chrono::high_resolution_clock::now();
+
+	matrix_transpose_cpu(a, b);
+
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto elapsed_time = std::chrono::duration<double>(t1 - t0).count() * 1000.;
+	std::cout << "CPU transposition: " << elapsed_time << " ms\n";
+
+	// Check the result
+	verify_results(a, b);
+
+	//////////////////////////////
+	// Naive version
+	//////////////////////////////
+	t0 = std::chrono::high_resolution_clock::now();
+
 
 	matrix_transpose_naive << <gridSize, blockSize >> > (d_a, d_b);
 
 	cudaDeviceSynchronize();
-	auto t1 = std::chrono::high_resolution_clock::now();
-	auto elapsed_time = std::chrono::duration<double>(t1 - t0).count() * 1000.;
+
+	t1 = std::chrono::high_resolution_clock::now();
+	elapsed_time = std::chrono::duration<double>(t1 - t0).count() * 1000.;
 	std::cout << "Naive CUDA transposition: " << elapsed_time << " ms\n";
 
 	// Copy result back to host and check the result
