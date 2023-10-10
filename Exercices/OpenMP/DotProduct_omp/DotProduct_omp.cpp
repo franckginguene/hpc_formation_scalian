@@ -125,7 +125,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_std = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("ComputePi (std): %.3f microsec\n", total_time_std.count() / (double)NB_THROW);
+	printf("Dot product (std): %.3f microsec\n", total_time_std.count() / (double)NB_THROW);
 
 	//
 	// Version OpenMP parallel
@@ -138,7 +138,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("\nComputePi (OMP parallel): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("\nDot product (OMP parallel): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -155,7 +155,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("\nComputePi (OMP parallel for atomic): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("\nDot product (OMP parallel for atomic): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -172,7 +172,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("\nComputePi (OMP parallel for redux): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("\nDot product (OMP parallel for redux): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -189,7 +189,7 @@ int main()
 	//stop = std::chrono::high_resolution_clock::now();
 	//total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	//printf("\nComputePi (OMP awful): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	//printf("\nDot product (OMP awful): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	//printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	//// Vérification des résultats

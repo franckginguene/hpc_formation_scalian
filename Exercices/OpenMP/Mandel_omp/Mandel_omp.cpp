@@ -17,8 +17,6 @@
 #include <xsimd-master/examples/pico_bench.hpp>
 #include <xsimd-master/include/xsimd/xsimd.hpp>
 
-#define NUM_THREADS 2
-
 // helper function to write the rendered image as PPM file
 inline void writePPM(	const std::string &	fileName,
 						const int			sizeX,
@@ -77,16 +75,16 @@ namespace omp {
 	{
 		float dx = (x1 - x0) / width;
 		float dy = (y1 - y0) / height;
-		int i, j;
-		for (j = 0; j < height; j++)
+		int index;
+		float x = 0, y = 0;
+		for (int j = 0; j < height; j++)
 		{
-
-			for (i = 0; i < width; ++i)
+			for (int i = 0; i < width; ++i)
 			{
-				float x = x0 + i * dx;
-				float y = y0 + j * dy;
+				x = x0 + i * dx;
+				y = y0 + j * dy;
 
-				int index = (j * width + i);
+				index = (j * width + i);
 				output[index] = mandel<float>(x, y, maxIterations);
 			}
 		}
@@ -164,7 +162,7 @@ int main()
 
 	auto bencher = pico_bench::Benchmarker<microseconds>{ nbiter, seconds{10} };
 
-	std::cout << "starting benchmarks (results in 'ms')... " << '\n';
+	std::cout << "starting benchmarks (results in micro-seconds)... " << '\n';
 
 	// export CVS
 	std::ofstream times_ms_file;

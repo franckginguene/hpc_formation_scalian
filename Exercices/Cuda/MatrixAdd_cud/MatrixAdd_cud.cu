@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 #define NB_COLS 4000  // Nombre de colonnes de la matrice.
 #define NB_ROWS	4000  // Nombre de lignes de la matrice.
@@ -58,6 +61,8 @@ int main(void)
 
 	// Lancement du noyau.
 	// TODO lancer le kernel avec le nombre de bloc et le nombre de threads par bloc adéquats
+
+	// Check status
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
@@ -112,5 +117,9 @@ void checkRes(int *mat)
 			}
 
 	printf("LEVEL 1: Done\n");
-	printf("Good job!\n");
+	std::cout << "  W   W   OOO   W   W  " << std::endl;
+	std::cout << "  W   W  O   O  W   W  " << std::endl;
+	std::cout << "  W W W  O   O  W W W  " << std::endl;
+	std::cout << "  W W W  O   O  W W W  " << std::endl;
+	std::cout << "   W W    OOO    W W   " << std::endl;
 }

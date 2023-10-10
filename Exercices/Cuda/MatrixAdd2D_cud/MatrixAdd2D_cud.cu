@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <chrono>
 
 #define NB_COLS 1000  // Nombre de colonnes de la matrice.
 #define NB_ROWS	1000  // Nombre de lignes de la matrice.
@@ -24,7 +27,7 @@ int main(void)
 
 	int nbElements = NB_COLS * NB_ROWS;
 	int matrixSize = nbElements * sizeof(int);
-	// TODO affectez le nombre de threads et calculez le nombre de blocs.
+	// TODO affectez le nombre de threads par block et calculez le nombre de blocs nécessaire.
 	// Le tout en 2D avec la formule magique
 	dim3 threadsPerBlock;
 	dim3 blocksPerGrid;
@@ -60,6 +63,10 @@ int main(void)
 	cudaMemcpy(dev_a, a, matrixSize, cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_b, b, matrixSize, cudaMemcpyHostToDevice);
 
+	// Init timer
+	cudaDeviceSynchronize();
+	auto t0 = std::chrono::high_resolution_clock::now();
+
 	// Lancement du noyau.
 	MatrixAdd << <blocksPerGrid, threadsPerBlock >> > (dev_a, dev_b, dev_c);
 	cudaStatus = cudaGetLastError();
@@ -67,6 +74,12 @@ int main(void)
 		fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
 		return -1;
 	}
+
+	// Arrêt timer et affichage du temps de calcul
+	cudaDeviceSynchronize();
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+	std::cout << "Execution CUDA : " << elapsed_time << " micro seconds\n";
 
 	// Copie de la matrice C du GPU vers le host.
 	cudaMemcpy(c, dev_c, matrixSize, cudaMemcpyDeviceToHost);
