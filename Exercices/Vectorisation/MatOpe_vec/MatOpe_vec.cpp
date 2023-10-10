@@ -33,7 +33,7 @@ void matOpeStd(const float* matrixA, const float* matrixB, float* matrixOut, con
 //
 void matOpeAuto(const float* matrixA, const float*  matrixB, float* matrixOut, const int nrCols, const int nrRows)
 {
-	// TODO !
+	// TODO ! Indice : indices :) 
 }
 
 //

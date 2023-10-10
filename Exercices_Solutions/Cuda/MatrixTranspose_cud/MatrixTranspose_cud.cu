@@ -2,10 +2,26 @@
 #include <stdlib.h>
 #include <iostream>
 #include <chrono>
+#include <cuda.h>
+#include <cuda_runtime.h>
 #include <assert.h>
 
-#define N 4096
-#define BLOCK_SIZE 16
+#define N 10000
+#define BLOCK_SIZE 64
+
+void matrix_transpose_cpu(int* input, int* output)
+{
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			int index = j + i * N;
+			int indexT = i + j * N;
+
+			output[indexT] = input[index];
+		}
+	}
+}
 
 __global__ void matrix_transpose_naive(int *input, int *output) 
 {
@@ -29,7 +45,7 @@ __global__ void matrix_transpose_shared(int *input, int *output)
 	// transposed global memory index for squared bloc size
 	int tindexX = indexY;
 	int tindexY = indexX;
-	// or in, general case
+	// or in general case
 	//int tindexX = threadIdx.x + blockIdx.y * blockDim.x;
 	//int tindexY = threadIdx.y + blockIdx.x * blockDim.y;
 
@@ -41,12 +57,12 @@ __global__ void matrix_transpose_shared(int *input, int *output)
 	int transposedIndex = tindexY * N + tindexX;
 
 	// reading from global memory in coalesed manner and performing tanspose in shared memory
-	sharedMemory[localIndexX][localIndexY] = input[index];
+	sharedMemory[localIndexX][localIndexY] = input[transposedIndex];
 
 	__syncthreads();
 
 	// writing into global memory in coalesed fashion via transposed data in shared memory
-	output[transposedIndex] = sharedMemory[localIndexX][localIndexY];
+	output[index] = sharedMemory[localIndexX][localIndexY];
 }
 
 //basically just fills the array with random integer between 0 and 99.
@@ -97,19 +113,34 @@ int main(void) {
 	cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
 
 	dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE, 1);
-	dim3 gridSize(N / BLOCK_SIZE, N / BLOCK_SIZE, 1);
+	dim3 gridSize((N + BLOCK_SIZE - 1) / BLOCK_SIZE, (N + BLOCK_SIZE - 1) / BLOCK_SIZE, 1);
+
+	//////////////////////////////
+	// CPU version
+	//////////////////////////////
+	auto t0 = std::chrono::high_resolution_clock::now();
+
+	matrix_transpose_cpu(a, b);
+
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+	std::cout << "CPU transposition: " << elapsed_time << " nano seconds\n";
+
+	// Check the result
+	verify_results(a, b);
 
 	//////////////////////////////
 	// Naive version
 	//////////////////////////////
-	auto t0 = std::chrono::high_resolution_clock::now();
+	cudaDeviceSynchronize();
+	t0 = std::chrono::high_resolution_clock::now();
 
-	matrix_transpose_naive << <gridSize, blockSize >> > (d_a, d_b);
+	matrix_transpose_naive <<< gridSize, blockSize >>> (d_a, d_b);
 	
 	cudaDeviceSynchronize();
-	auto t1 = std::chrono::high_resolution_clock::now();
-	auto elapsed_time = std::chrono::duration<double>(t1 - t0).count() * 1000.;
-	std::cout << "Naive CUDA transposition: " << elapsed_time << " ms\n";
+	t1 = std::chrono::high_resolution_clock::now();
+	elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+	std::cout << "Naive CUDA transposition: " << elapsed_time << " nano seconds\n";
 
 	// Copy result back to host and check the result
 	cudaMemcpy(b, d_b, size, cudaMemcpyDeviceToHost);
@@ -118,14 +149,15 @@ int main(void) {
 	//////////////////////////////
 	// Shared memory version
 	//////////////////////////////
+	cudaDeviceSynchronize();
 	t0 = std::chrono::high_resolution_clock::now();
 
-	matrix_transpose_shared << <gridSize, blockSize >> > (d_a, d_b);
+	matrix_transpose_shared <<< gridSize, blockSize >>> (d_a, d_b);
 
 	cudaDeviceSynchronize();
 	t1 = std::chrono::high_resolution_clock::now();
-	elapsed_time = std::chrono::duration<double>(t1 - t0).count() * 1000.;
-	std::cout << "CUDA transposition using shared memory: " << elapsed_time << " ms\n";
+	elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+	std::cout << "CUDA transposition using shared memory: " << elapsed_time << " nano seconds\n";
 
 	// Copy result back to host and check the result
 	cudaMemcpy(b, d_b, size, cudaMemcpyDeviceToHost);

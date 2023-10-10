@@ -22,18 +22,22 @@ int main()
 	{
 		int id = omp_get_thread_num();
 
-//#pragma omp barrier
+
 #pragma omp single
 		{
 			std::cout << "OpenMP threads: " << omp_get_num_threads() << std::endl;
 		}
+//#pragma omp barrier
+
 		if (omp_get_thread_num() == 2)
 		{
 			std::cout << ""; 
 		}
 
 #pragma omp barrier
-		
+		std::cout << "Hello from thread " << id << '\n';
+
+#pragma omp barrier
 		printf("Hello from thread %d \n", id);
 
 

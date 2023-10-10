@@ -1,10 +1,10 @@
 @echo off
 
-set QTDIR=C:\dev\libs\Qt\5.14.0\msvc2017_64\bin
-set VCDIR=C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional
-set CUDA_DIR=C:\PROGRA~1\NVIDIA~2\CUDA\v11.1
-set CUDA_ARCH=75
-set WIN_SDK=10.0.17763.0
+set QTDIR=C:\lib\Qt\5.14.2\msvc2017_64\bin
+set VCDIR=C:\Program Files\Microsoft Visual Studio\2022\Community
+set CUDA_DIR=C:\PROGRA~1\NVIDIA~2\CUDA\v12.1
+set CUDA_ARCH=86
+set WIN_SDK=10.0.22621.0
 
 REM NE PLUS RIEN MODIFIER
 
@@ -24,6 +24,8 @@ del DIRtempName.txt
 set CUDA_BIN_DIR=%CUDA_DIR%\bin
 set CUDA_LIB_DIR=%CUDA_DIR%\Lib\x64
 set CUDA_INC_DIR=%CUDA_DIR%\include
+
+echo %~s1 "%CUDA_INC_DIR%" 
 
 set PATH=%QTDIR%\bin;%CUDA_BIN_DIR%;%MPI_EXEC_DIR%
 echo %PATH%

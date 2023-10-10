@@ -73,19 +73,14 @@ double dotProductParallelFor(const std::vector<double> & vectorA, const std::vec
 //
 double dotProductRedux(const std::vector<double> & vectorA, const std::vector<double> & vectorB)
 {
-    double res = 0;
+	double dotProduct = 0.0;
 
-#pragma omp parallel num_threads(NUM_THREADS) shared(res)
-	{
-		res = threadId;
+#pragma omp parallel for reduction(+:dotProduct) num_threads(NUM_THREADS)
+	for (int i = 0; i < vectorA.size(); ++i) {
+		dotProduct += vectorA[i] * vectorB[i];
 	}
-	res;
-    for (int i = 0; i < SIZE; i++)
-    {
-        res += vectorA[i] * vectorB[i];
-    }
 
-    return res;
+	return dotProduct;
 }
 
 //
@@ -149,7 +144,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_std = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("ComputePi (std): %.3f microsec\n", total_time_std.count() / (double)NB_THROW);
+	printf("Dot product (std): %.3f microsec\n", total_time_std.count() / (double)NB_THROW);
 
 	//
 	// Version OpenMP parallel
@@ -162,7 +157,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("ComputePi (OMP parallel): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("Dot product (OMP parallel): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -179,7 +174,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("ComputePi (OMP parallel for atomic): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("Dot product (OMP parallel for atomic): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -196,7 +191,7 @@ int main()
 	stop = std::chrono::high_resolution_clock::now();
 	total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	printf("ComputePi (OMP parallel for redux): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	printf("Dot product (OMP parallel for redux): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	// Vérification des résultats
@@ -213,7 +208,7 @@ int main()
 	//stop = std::chrono::high_resolution_clock::now();
 	//total_time_omp = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	//printf("ComputePi (OMP awful): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
+	//printf("Dot product (OMP awful): %.3f microsec\n", total_time_omp.count() / (double)NB_THROW);
 	//printf(" - Speedup: %.3f\n", total_time_std / total_time_omp);
 
 	//// Vérification des résultats

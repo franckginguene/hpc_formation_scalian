@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
-#define NB_COLS 4000  // Nombre de colonnes de la matrice.
-#define NB_ROWS	4000  // Nombre de lignes de la matrice.
+#define NB_COLS 20000 //4000  // Nombre de colonnes de la matrice.
+#define NB_ROWS	20000 //4000  // Nombre de lignes de la matrice.
 
 void matrixInit (int *mat);   // Initialisation d'une matrice.
 void checkRes (int *mat);     // Vérification des résultats.
@@ -111,5 +114,9 @@ void checkRes(int *mat)
             }
 
     printf ("LEVEL 1: Done\n");
-    printf ("Good job!\n");
+    std::cout << "  W   W   OOO   W   W  " << std::endl;
+    std::cout << "  W   W  O   O  W   W  " << std::endl;
+    std::cout << "  W W W  O   O  W W W  " << std::endl;
+    std::cout << "  W W W  O   O  W W W  " << std::endl;
+    std::cout << "   W W    OOO    W W   " << std::endl;
 }

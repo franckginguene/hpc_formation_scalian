@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <chrono>
 
 #define NB_COLS 1000  // Nombre de colonnes de la matrice.
 #define NB_ROWS	500  // Nombre de lignes de la matrice.
@@ -45,6 +48,10 @@ int main(void)
 	c = (int *)malloc(matrixSize);
 	if (c == NULL) { printf("Allocation failure\n"); abort(); }
 
+	// Initialisation des matrices A et B.
+	matrixInit(a);
+	matrixInit(b);
+
 	// Allocation des matrices du device.
 	cudaMalloc((void **)&dev_a, matrixSize);
 	cudaMalloc((void **)&dev_b, matrixSize);
@@ -55,13 +62,14 @@ int main(void)
 		return -1;
 	}
 
-	// Initialisation des matrices A et B.
-	matrixInit(a);
-	matrixInit(b);
-
 	// Copie des matrices A et B sur le GPU.
 	cudaMemcpy(dev_a, a, matrixSize, cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_b, b, matrixSize, cudaMemcpyHostToDevice);
+
+
+	// Init timer
+	cudaDeviceSynchronize();
+	auto t0 = std::chrono::high_resolution_clock::now();
 
 	// Lancement du noyau.
 	MatrixAdd <<<blocksPerGrid, threadsPerBlock>>> (dev_a, dev_b, dev_c);
@@ -70,6 +78,12 @@ int main(void)
 		fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
 		return -1;
 	}
+
+	// Arrêt timer et affichage du temps de calcul
+	cudaDeviceSynchronize();
+	auto t1 = std::chrono::high_resolution_clock::now();
+	auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+	std::cout << "Execution CUDA : " << elapsed_time << " micro seconds\n";
 
 	// Copie de la matrice C du GPU vers le host.
 	cudaMemcpy(c, dev_c, matrixSize, cudaMemcpyDeviceToHost);
@@ -95,6 +109,52 @@ int main(void)
 // Fonctions outils. Rien à modifier.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////
+
+// Version CPU uniquement
+//int main(void)
+//{
+//	int* a, * b, * c;              // Matrices A, B et C du host
+//
+//	int nbElements = NB_COLS * NB_ROWS;
+//	int matrixSize = nbElements * sizeof(int);
+//
+//	// Allocation des matrices du host.
+//	a = (int*)malloc(matrixSize);
+//	if (a == NULL) { printf("Allocation failure\n"); abort(); }
+//
+//	b = (int*)malloc(matrixSize);
+//	if (b == NULL) { printf("Allocation failure\n"); abort(); }
+//
+//	c = (int*)malloc(matrixSize);
+//	if (c == NULL) { printf("Allocation failure\n"); abort(); }
+//
+//	// Initialisation des matrices A et B.
+//	matrixInit(a);
+//	matrixInit(b);
+//
+//	// Init timer
+//	auto t0 = std::chrono::high_resolution_clock::now();
+//
+//	for (int i = 0; i < NB_ROWS; i++)
+//		for (int j = 0; j < NB_COLS; j++)
+//			c[i * NB_COLS + j] = a[i * NB_COLS + j] + b[i * NB_COLS + j];
+//
+//	// Arrêt timer et affichage du temps de calcul
+//	auto t1 = std::chrono::high_resolution_clock::now();
+//	auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+//	std::cout << "Execution CPU : " << elapsed_time << " micro seconds\n";
+//
+//	checkRes(c);
+//
+//	// Libération des matrices host et device.
+//	free(a);
+//	free(b);
+//	free(c);
+//
+//	getchar();
+//
+//	return 0;
+//}
 
 void matrixInit(int *mat)
 {

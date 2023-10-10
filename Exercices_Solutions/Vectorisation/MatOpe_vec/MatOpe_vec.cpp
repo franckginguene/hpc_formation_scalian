@@ -115,6 +115,20 @@ void matOpeXSIMD(const float* const __restrict matrixA, float* __restrict matrix
 		auto bres = one / sqrt((ba + bb) / sqrt(bb));
 		bres.store_aligned(&matrixOut[i]);
 	}
+
+	// Plus d'info sur les alignements :
+	// https://xsimd.readthedocs.io/en/latest/vectorized_code.html#aligned-vs-unaligned-memory
+}
+
+//
+// Version modifiée pour aider le compilateur à réaliser une vectorisation automatique (avec des vecteurs et non des pointeurs)
+//
+void matOpeAutoVector(const std::vector<float> & __restrict matrixA, const std::vector<float> & __restrict matrixB, std::vector<float> & __restrict matrixOut)
+{
+	for (int i = 0; i < matrixA.size(); i++)
+	{
+		matrixOut[i] = 1.f / sqrt((matrixA[i] + matrixB[i]) / sqrt(matrixB[i]));
+	}
 }
 
 // Vérification des résultats
@@ -259,6 +273,25 @@ int main()
 	// Vérification des résultats
 	//
 	checkRes(matrixOutStd, matrixOutSIMD);
+
+	//
+	// Lancement de la version "vector"
+	//
+	// Allocation des vectors
+	std::vector<float> vectA(SIZE * SIZE);
+	std::vector<float> vectB(SIZE * SIZE);
+	std::vector<float> vectOut(SIZE * SIZE);
+
+	timer_start(&start);
+
+	for (int i = 0; i < NB_THROW; i++)
+		matOpeAutoVector(vectA, vectB, vectOut);
+
+	float timAutoVect = timer_stop(&start) / (float)NB_THROW;
+
+	printf("\nMatAdd (vectorized xsimd): %.3fs\n", timAutoVect);
+	printf(" - Speedup: %.3f\n", timStd / timAutoVect);
+
 
     return 0;
 }

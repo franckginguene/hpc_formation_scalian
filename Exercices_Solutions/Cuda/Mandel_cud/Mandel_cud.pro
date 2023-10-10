@@ -8,5 +8,6 @@ SOURCES -= *.cu  // Dirty trick to add the CU files in the QTCreator source file
 CUDA_SOURCES += *.cu
 
 INCLUDEPATH  += ..\..\libs\
+INCLUDEPATH  += CUDA_INC_DIR
 
 message($$INCLUDEPATH)

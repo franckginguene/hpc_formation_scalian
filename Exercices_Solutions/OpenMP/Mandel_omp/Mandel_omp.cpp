@@ -56,6 +56,7 @@ namespace omp {
 	{
 		T z_re = c_re, z_im = c_im;
 		int i;
+
 		for (i = 0; i < count; ++i)
 		{
 			if (z_re * z_re + z_im * z_im > 4.f)
@@ -77,7 +78,7 @@ namespace omp {
 	{
 		float dx = (x1 - x0) / width;
 		float dy = (y1 - y0) / height;
-		#pragma omp parallel for num_threads(NUM_THREADS)
+#pragma omp parallel for num_threads(NUM_THREADS)
 		for (int j = 0; j < height; j++)
 		{
 			for (int i = 0; i < width; ++i)
@@ -153,7 +154,6 @@ int main()
 
 	const int maxIters = 256;
 	constexpr size_t nbiter = 10;
-	constexpr int nbpoints = 20;
 	float x0_vec, x1_vec, y0_vec, y1_vec;
 
 	float scale = 4.f * (float)std::pow(2., -std::min(13*100 / 60., 53.)*0.7);
@@ -166,7 +166,7 @@ int main()
 
 	auto bencher = pico_bench::Benchmarker<microseconds>{ nbiter, seconds{10} };
 
-	std::cout << "starting benchmarks (results in 'ms')... " << '\n';
+	std::cout << "starting benchmarks (results in micro-seconds)... " << '\n';
 
 	// export CVS
 	std::ofstream times_ms_file;
@@ -183,10 +183,6 @@ int main()
 
 	times_ms_file << "\n";
 
-	// Output (optionel)
-	std::string name = "mandelbrot_scalar.ppm";
-	writePPM(name, width, height, buf.data());
-
 	//// omp run //////////////////////////////////////////////////////////////////
 
 	std::fill(buf.begin(), buf.end(), 0);
@@ -194,6 +190,10 @@ int main()
 	auto stats_omp = bencher([&]() {
 		omp::mandelbrot(x0_vec, y0_vec, x1_vec, y1_vec, width, height, maxIters, buf.data());
 	});
+
+	// Output (optionel)
+	std::string name = "mandelbrot_scalar.ppm";
+	writePPM(name, width, height, buf.data());
 
 	times_ms_file << stats_omp.mean().count() << ",";
 	std::cout << '\n' << "omp " << stats_omp << '\n';
