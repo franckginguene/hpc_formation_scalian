@@ -5,5 +5,6 @@ CONFIG += debug_and_release
 SUBDIRS += 	HelloWorld_omp 	\
 			DotProduct_omp	\
 			Mandel_omp		\
+			DotProduct_omp_simd		\
 			Mandel_full	
            	
