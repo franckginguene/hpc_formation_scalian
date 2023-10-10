@@ -1,10 +1,10 @@
 @echo off
 
-set QTDIR=C:\dev\libs\Qt\5.14.0\msvc2017_64\bin
-set VCDIR=C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional
-set CUDA_DIR=C:\PROGRA~1\NVIDIA~2\CUDA\v11.1
-set CUDA_ARCH=50
-set WIN_SDK=10.0.17763.0
+set QTDIR=C:\lib\Qt\5.14.2\msvc2017_64\bin
+set VCDIR=C:\Program Files\Microsoft Visual Studio\2022\Community
+set CUDA_DIR=C:\PROGRA~1\NVIDIA~2\CUDA\v12.1
+set CUDA_ARCH=86
+set WIN_SDK=10.0.22621.0
 
 REM NE PLUS RIEN MODIFIER
 
