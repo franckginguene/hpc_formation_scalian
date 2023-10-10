@@ -56,3 +56,5 @@ cuda.name = cuda ${QMAKE_FILE_IN}
 cuda.input = CUDA_SOURCES
 cuda.depend_command = echo ${QMAKE_FILE_IN}
 QMAKE_EXTRA_COMPILERS += cuda
+
+INCLUDEPATH  += $(CUDA_INC_DIR)	
